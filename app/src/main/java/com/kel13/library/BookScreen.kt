@@ -57,17 +57,17 @@ fun BookAppBar(
 
 @Composable
 fun BookApp(
-    viewModel: BookViewModel =  viewModel(),
+    viewModel: BookViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
         topBar = {
             val currentBackStackEntry = navController.currentBackStackEntryAsState().value
             val canNavigateBack = navController.previousBackStackEntry != null
-            val title = when (currentBackStackEntry?.destination?.route) {
-                BookScreen.List.name -> "My Books"
-                BookScreen.Create.name -> "Add New Book"
-                BookScreen.Edit.name -> "Edit Book"
+            val title = when {
+                currentBackStackEntry?.destination?.route == BookScreen.List.name -> "My Books"
+                currentBackStackEntry?.destination?.route == BookScreen.Create.name -> "Add New Book"
+                currentBackStackEntry?.destination?.route?.startsWith(BookScreen.Edit.name) == true -> "Edit Book"
                 else -> "Book App"
             }
 
@@ -105,13 +105,17 @@ fun BookApp(
             // Edit book screen
             composable(route = "${BookScreen.Edit.name}/{index}") { backStackEntry ->
                 val index = backStackEntry.arguments?.getString("index")?.toIntOrNull()
-                val book = index?.let { viewModel.books[it] }
+                val book = index?.let { viewModel.books.getOrNull(it) }
 
                 if (book != null) {
                     BookForm(
                         book = book,
                         onSave = { updatedBook ->
                             viewModel.updateBook(index, updatedBook)
+                            navController.popBackStack()
+                        },
+                        onDelete = {
+                            viewModel.deleteBook(index)
                             navController.popBackStack()
                         }
                     )

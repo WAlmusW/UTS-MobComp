@@ -17,4 +17,16 @@ class BookViewModel : ViewModel() {
     fun updateBook(index: Int, book: Book) {
         books[index] = book
     }
+
+    // Delete book by index
+    fun deleteBook(index: Int) {
+        if (index in books.indices) {
+            books.removeAt(index)
+        }
+    }
+
+    // Alternatively, delete book by instance
+    fun deleteBook(book: Book) {
+        books.remove(book)
+    }
 }
