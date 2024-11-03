@@ -1,6 +1,10 @@
 package com.kel13.library
 
+import RepeatingPatternBackground
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -12,6 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,7 +27,7 @@ import androidx.navigation.compose.rememberNavController
 
 import com.kel13.library.ui.BookListScreen
 import com.kel13.library.ui.BookViewModel
-import com.kel13.library.ui.components.BookForm
+import com.kel13.library.ui.BookForm
 
 enum class BookScreen {
     List,
@@ -34,10 +40,36 @@ fun BookAppBar(
     title: String,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
+    currentRoute: String?, // Add currentRoute parameter
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text(text = title) },
+        title = {
+            if (currentRoute == BookScreen.List.name) {
+                // Only apply the background with CutCornerShape on the List page
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color(0xFF473535), // Set the brown color
+                            shape = CutCornerShape(topEnd = 16.dp, bottomEnd = 16.dp) // Customize the corner
+                        )
+                        .padding(horizontal = 20.dp, vertical = 8.dp) // Inner padding for the text
+                ) {
+                    Text(
+                        text = title,
+                        color = Color(0xFFA98A88), // Set text color to make it stand out
+                        style = MaterialTheme.typography.titleLarge // Adjust text style as needed
+                    )
+                }
+            } else {
+                // Simple text without background for other pages
+                Text(
+                    text = title,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer, // Use default text color
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+        },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
@@ -60,21 +92,25 @@ fun BookApp(
     viewModel: BookViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    RepeatingPatternBackground()
+
     Scaffold(
         topBar = {
             val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+            val currentRoute = currentBackStackEntry?.destination?.route
             val canNavigateBack = navController.previousBackStackEntry != null
             val title = when {
-                currentBackStackEntry?.destination?.route == BookScreen.List.name -> "My Books"
-                currentBackStackEntry?.destination?.route == BookScreen.Create.name -> "Add New Book"
-                currentBackStackEntry?.destination?.route?.startsWith(BookScreen.Edit.name) == true -> "Edit Book"
-                else -> "Book App"
+                currentRoute == BookScreen.List.name -> "MuArchive"
+                currentRoute == BookScreen.Create.name -> "Add New Book"
+                currentRoute?.startsWith(BookScreen.Edit.name) == true -> "Edit Book"
+                else -> "MuArchive"
             }
 
             BookAppBar(
                 title = title,
                 canNavigateBack = canNavigateBack,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigateUp() },
+                currentRoute = currentRoute
             )
         }
     ) { innerPadding ->
