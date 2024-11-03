@@ -146,7 +146,16 @@ fun BookForm(
         Button(
             onClick = {
                 if (title.isNotBlank()) {
-                    onSave(Book(title, author, publisher, year, genre, summary))
+                    val bookToSave = Book(
+                        id = book?.id ?: 0, // Handle the ID for new or existing books
+                        title = title,
+                        author = author,
+                        publisher = publisher,
+                        year = year,
+                        genre = genre,
+                        summary = summary
+                    )
+                    onSave(bookToSave)
                 }
             },
             modifier = Modifier.fillMaxWidth()

@@ -192,10 +192,6 @@ fun BookListScreenPreview() {
         BookListScreen(
             onEditBook = {},
             onAddBook = {},
-            books = listOf(
-                Book("Book One", "Author One", "Publisher One", "2022", "Fiction", "Summary of Book One."),
-                Book("Book Two", "Author Two", "Publisher Two", "2023", "Science", "Summary of Book Two.")
-            )
         )
     }
 }
