@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,14 +52,17 @@ fun BookListScreen(
     onAddBook: () -> Unit,
     books: List<Book> = viewModel.books
 ) {
-    // State to control the visibility of edit buttons
+    var searchQuery by remember { mutableStateOf("") }
     var editButtonsVisible by remember { mutableStateOf(false) }
+
+    // Filter the books based on the search query
+    val filteredBooks = books.filter { it.title.contains(searchQuery, ignoreCase = true) }
 
     RepeatingPatternBackground()
 
     Scaffold(
+        containerColor = Color.Transparent,
         floatingActionButton = {
-            // Row to hold two FloatingActionButtons side by side
             Row(
                 modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -81,26 +85,32 @@ fun BookListScreen(
             }
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)) {
-                // Box containing "Books:" label and Search bar
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)) {
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+                .width(3000.dp)
+                .height(675.dp)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.White, Color(0xFFF5F5DC))
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(16.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                Box(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
                     Row {
                         Text(
                             text = "Books:",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier
-                                .padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
                         TextField(
-                            value = "",
-                            onValueChange = {},
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
                             placeholder = { Text("Search title") },
-                            shape = RoundedCornerShape(20.dp), // Adjust the dp value for the desired rounded corner
+                            shape = RoundedCornerShape(20.dp),
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
@@ -112,15 +122,14 @@ fun BookListScreen(
                     }
                 }
 
-                // List of books below the search bar
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 70.dp) // Add padding to prevent overlap with FABs
+                        .padding(bottom = 70.dp)
                 ) {
-                    items(books.size) { index ->
+                    items(filteredBooks.size) { index ->
                         BookItem(
-                            book = books[index],
+                            book = filteredBooks[index],
                             onEditClick = { onEditBook(index) },
                             showEditButton = editButtonsVisible
                         )
@@ -138,7 +147,7 @@ fun BookItem(book: Book, onEditClick: () -> Unit, showEditButton: Boolean) {
             .fillMaxWidth()
             .padding(8.dp)
             .background(
-                color = Color(0xFF8B5E3C), // Brown color
+                color = Color(0xFF7A3838), // Brown color
                 shape = CutCornerShape(topEnd = 24.dp, bottomStart = 24.dp)
             )
             .padding(8.dp)

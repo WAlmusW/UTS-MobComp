@@ -101,15 +101,15 @@ fun BookForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
-                .border(1.dp, Color.Gray) // Add a border
+                .border(1.dp, Color.Gray)
                 .clickable { expanded = true }
-                .padding(8.dp) // Add inner padding
+                .padding(8.dp)
         ) {
             Row {
                 Text(
                     text = "Genre: $genre",
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(1f) // Pushes the icon to the right
+                    modifier = Modifier.weight(1f)
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
@@ -144,7 +144,11 @@ fun BookForm(
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { onSave(Book(title, author, publisher, year, genre, summary)) },
+            onClick = {
+                if (title.isNotBlank()) {
+                    onSave(Book(title, author, publisher, year, genre, summary))
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Save")
@@ -162,7 +166,6 @@ fun BookForm(
         }
     }
 }
-
 
 
 @Preview(showBackground = true)
